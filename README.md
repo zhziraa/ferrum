@@ -6,7 +6,7 @@
 
 **Понятные анализы на железо: разбор бланка, динамика и напоминания о приёме.**
 
-[**Открыть демо →**](https://USERNAME.github.io/ferrum/) &nbsp;·&nbsp; работает с телефона, ставится на главный экран как приложение
+[**Открыть демо →**](https://zhziraa.github.io/ferrum/) &nbsp;·&nbsp; работает с телефона, ставится на главный экран как приложение
 
 </div>
 
@@ -96,13 +96,13 @@ ferrum/
 **Локально** (service worker работает только через http, не через `file://`):
 
 ```bash
-git clone https://github.com/USERNAME/ferrum.git
+git clone https://github.com/zhziraa/ferrum.git
 cd ferrum
 python3 -m http.server 8000
 # откройте http://localhost:8000
 ```
 
-**Публикация на GitHub Pages:** Settings → Pages → Source: *Deploy from a branch* → Branch: `main`, папка `/ (root)` → Save. Через минуту сайт будет доступен по адресу `https://USERNAME.github.io/ferrum/`.
+**Публикация на GitHub Pages:** Settings → Pages → Source: *Deploy from a branch* → Branch: `main`, папка `/ (root)` → Save. Через минуту сайт будет доступен по адресу `https://zhziraa.github.io/ferrum/`.
 
 ## Roadmap
 
