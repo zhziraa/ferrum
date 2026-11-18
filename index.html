@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ferrum — понятные анализы на железо</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prata&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#8E1330">
+<meta name="description" content="Ferrum — понятный разбор анализов на железо и напоминания о приёме. Данные остаются только на твоём устройстве.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ferrum">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="splash" aria-hidden="true">
+  <div class="stage"><div class="pop" id="splashPop"></div></div>
+  <p class="fact">У бобров зубы оранжевые из-за железа в эмали.<br>У нашего бобрёнка они белеют, когда железа мало.</p>
+</div>
+<div class="wrap">
+
+  <header class="logo">
+    <div class="fe"><small>26</small>Fe<i>55,845</i></div>
+    <span class="wordmark">Ferrum</span>
+  </header>
+
+  <!-- ===== ПРИВЕТСТВИЕ ===== -->
+  <section id="s-welcome" class="cover">
+    <div class="avatar xl" id="av-welcome"></div>
+    <h1 class="display">Пойми свои анализы на железо</h1>
+    <p class="lede">Я Ферра. Разложу бланк по полочкам, покажу, как меняются твои показатели, и напомню про режим приёма.</p>
+    <button class="btn" onclick="gate(false)">Начать</button>
+    <button class="btn ghost" onclick="gate(true)">Посмотреть на примере</button>
+    <p class="fine">Ferrum не ставит диагнозы, не назначает препараты и дозировки и не заменяет врача. Он помогает понять бланк анализов, а решения о лечении принимаются вместе с врачом.</p>
+  </section>
+
+  <!-- ===== ПРИЛОЖЕНИЕ ===== -->
+  <section id="s-app" class="hidden">
+    <nav class="tabs" aria-label="Разделы">
+      <button id="t-input" class="on" onclick="tab('input')"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6A2 2 0 0 0 19 18l-5-9V3"/></svg>Анализы</button>
+      <button id="t-report" onclick="tab('report')"><svg viewBox="0 0 24 24"><path d="M12 3c0 0-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11z"/></svg>Отчёт</button>
+      <button id="t-remind" onclick="tab('remind')"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>Режим</button>
+    </nav>
+
+    <!-- ВВОД -->
+    <div id="p-input" class="card">
+      <h2>Новый анализ</h2>
+      <p class="muted" style="margin-top:-4px">Перепиши числа с бланка. Можно заполнить не все поля — хватит и одного ферритина.</p>
+
+      <div class="field">
+        <label for="date">Дата сдачи</label>
+        <div class="inputs"><input type="date" id="date"></div>
+      </div>
+      <div id="fields"></div>
+
+      <details class="more">
+      <summary>+ Добавить детали<small>По желанию: условия сдачи и самочувствие делают отчёт точнее</small></summary>
+      <div class="field">
+        <label>Условия сдачи</label>
+        <div class="hint">Они влияют на результаты, поэтому помогают правильно их прочитать.</div>
+        <label class="chk"><input type="checkbox" id="c-fasting"> Сдавала утром натощак</label>
+        <label class="chk"><input type="checkbox" id="c-heavy"> Обильные месячные в этом цикле</label>
+        <label class="chk"><input type="checkbox" id="c-sick"> Болела или простужалась за последние 2 недели</label>
+        <label class="chk"><input type="checkbox" id="c-taking"> Уже принимаю железо по назначению врача</label>
+        <div class="inputs" style="margin-top:8px"><span class="muted">День цикла при сдаче</span><input type="number" id="c-day" min="1" max="45" placeholder="—" style="width:80px"></div>
+      </div>
+
+      <div class="field">
+        <label>Самочувствие в последние дни</label>
+        <div class="hint">Чтобы увидеть, как самочувствие связано с показателями.</div>
+        <div id="symFields"></div>
+      </div>
+      </details>
+
+      <button class="btn" onclick="saveEntry()">Сохранить и показать отчёт</button>
+
+      <div style="margin-top:18px">
+        <div class="muted"><b>Сохранённые анализы</b></div>
+        <div class="hist" id="hist"></div>
+        <button class="btn ghost small noprint" id="demoBtn" onclick="loadDemo()">Загрузить пример (5 анализов за год)</button>
+      </div>
+    </div>
+
+    <!-- ОТЧЁТ -->
+    <div id="p-report" class="hidden">
+      <div id="report-empty" class="card hero">
+        <div class="avatar" id="av-empty"></div>
+        <div class="bubble">Пока нет данных. Добавь анализ на вкладке «Анализы» или загрузи пример.</div>
+      </div>
+
+      <div id="report">
+        <div class="stories" id="stories" tabindex="0" aria-label="Отчёт в виде историй, листай нажатием справа или стрелками">
+          <div class="bars" id="storyBars"></div>
+          <div class="story-stage" id="storyStage"></div>
+        </div>
+        <p class="story-hint">Нажимай справа, чтобы листать дальше, слева — чтобы вернуться</p>
+        <button class="btn ghost" id="detailsBtn" onclick="toggleDetails()">Открыть подробный отчёт</button>
+
+        <div id="details" class="hidden">
+        <div class="card hero compact">
+          <div class="avatar" id="av-report"></div>
+          <div class="bubble" id="summary"></div>
+        </div>
+
+        <div class="card" id="insights-card">
+          <h3>Главное</h3>
+          <div id="insights"></div>
+        </div>
+
+        <div class="card">
+          <h3>Каждый показатель</h3>
+          <p class="muted" style="margin-top:-6px" id="latest-date"></p>
+          <div id="results"></div>
+        </div>
+
+        <div class="card">
+          <h3>Что спросить у врача</h3>
+          <ol class="qs" id="questions"></ol>
+        </div>
+
+        <div class="row noprint">
+          <button class="btn ghost" onclick="copyReport()">Скопировать отчёт</button>
+          <button class="btn ghost" onclick="window.print()">Распечатать / PDF</button>
+        </div>
+
+        <p class="sec-label">Подробнее, если интересно</p>
+
+        <details class="card fold" id="dyn-card"><summary><h3>Динамика</h3><span>Как менялся каждый показатель</span></summary><div class="fold-body">
+          <p class="muted" style="margin-top:0">Зелёная полоса — норма с бланка, пунктир — общий тренд, пустой кружок — результат, который мог быть искажён.</p>
+          <div id="charts"></div></div></details>
+
+        <details class="card fold"><summary><h3>Где сейчас отклонения</h3><span>Запасы → транспорт → гемоглобин</span></summary><div class="fold-body">
+          <p class="muted" style="margin-top:0">Обычно сначала снижаются запасы, потом транспорт железа, и только потом гемоглобин.</p>
+          <div class="chain" id="chain"></div></div></details>
+
+        <details class="card fold" id="pace-card"><summary><h3>Темп и регулярность</h3><span>Как быстро растёт ферритин и помогает ли регулярный приём</span></summary><div class="fold-body">
+          <div id="pace"></div>
+          <div id="periods"></div></div></details>
+
+        <details class="card fold" id="sym-card"><summary><h3>Самочувствие</h3><span>Как менялись ощущения вместе с запасами</span></summary><div class="fold-body">
+          <div id="sym"></div></div></details>
+
+        <details class="card fold"><summary><h3>Что могло повлиять</h3><span>Условия сдачи и можно ли сравнивать анализы</span></summary><div class="fold-body">
+          <div id="factors"></div>
+          <h4 style="margin:16px 0 4px">Можно ли сравнивать анализы</h4>
+          <p class="muted" style="margin-top:0">Результаты, искажённые условиями сдачи, не учитываются в тренде.</p>
+          <div id="quality"></div></div></details>
+
+        <details class="card fold"><summary><h3>Откуда эти цифры</h3><span>Источники: ВОЗ, профессиональные общества, исследования</span></summary><div class="fold-body">
+          <p class="muted" style="margin-top:0">Число в квадратных скобках в тексте — номер источника.</p>
+          <ol class="src" id="src-list"></ol></div></details>
+
+        <div class="disclaimer">Это не диагноз. Отчёт помогает подготовиться к приёму, а оценить результаты вместе с самочувствием и историей здоровья может только врач.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- РЕЖИМ -->
+    <div id="p-remind" class="hidden">
+      <div class="timer" id="timer">
+        <div class="t-top">
+          <div class="t-ava" id="tAva"></div>
+          <div class="t-main">
+            <div class="t-phase" id="tPhase">—</div>
+            <div class="t-count" id="tCount">--:--:--</div>
+            <div class="t-next" id="tNext"></div>
+          </div>
+        </div>
+        <div class="t-bar"><i id="tBar"></i></div>
+        <p class="t-hint" id="tHint"></p>
+        <button class="btn hidden" id="tTake" onclick="takeNow()">Приняла ✓</button>
+      </div>
+      <button class="linkbtn" onclick="openDoseModal()">Посмотреть, как выглядит напоминание</button>
+    <details class="card fold" id="setupBox"><summary><h3>Время приёма</h3><span id="setupSub">Укажи, когда принимаешь железо по назначению врача</span></summary><div class="fold-body">
+      <p class="muted" style="margin-top:0">Ferrum не подбирает препарат, дозу и частоту. Он только напоминает об общих правилах усвоения.</p>
+      <div class="inputs" style="margin:10px 0 6px">
+        <input type="time" id="doseTime" value="17:00">
+        <button class="btn small" onclick="saveReminder()">Сохранить</button>
+      </div>
+      <div id="timeline"></div>
+      <button class="btn ghost small" id="icsBtn" onclick="downloadICS()">📅 Добавить в календарь телефона</button>
+      <p class="muted" style="font-size:12px;margin:8px 0 0">Так напоминания придут, даже когда сайт закрыт. Без календаря они работают, только пока страница открыта.</p>
+    </div></details>
+
+    <div class="card">
+      <h3>Отметка приёма</h3>
+      <p class="muted" style="margin-top:-6px">Отмечай каждый день. В отчёте будет видно, как регулярность связана с изменениями ферритина.</p>
+      <button class="btn" id="takeBtn" onclick="markTaken()">Я приняла железо сегодня</button>
+      <div class="dots" id="dots"></div>
+      <p class="muted" id="intakeStat"></p>
+    </div>
+    </div>
+    <button id="pill" class="pill-timer hidden" onclick="tab('remind')"></button>
+  </section>
+
+  <!-- окно напоминания о приёме -->
+  <div id="doseModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="sheet">
+      <div class="m-ava" id="mAva"></div>
+      <h2 id="mTitle">Время приёма железа</h2>
+      <p>Прими препарат так, как назначил врач. Запить можно водой или соком с витамином C — он помогает усвоению.</p>
+      <p class="muted">Следующие 2 часа лучше без чая, кофе и молочного.</p>
+      <button class="btn" onclick="takeNow(true)">Приняла ✓</button>
+      <button class="btn ghost" onclick="snooze()">Напомнить через 10 минут</button>
+    </div>
+  </div>
+
+  <!-- короткая проверка перед стартом -->
+  <div id="gateModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="gTitle">
+    <div class="sheet">
+      <h2 id="gTitle" style="font-size:26px">Один вопрос</h2>
+      <p>Ferrum считает пороги для взрослых женщин, которые сейчас не беременны. Это про тебя?</p>
+      <button class="btn" onclick="gateYes()">Да, мне 18+ и я не беременна</button>
+      <button class="btn ghost" onclick="gateNo()">Нет</button>
+      <div id="gateNoMsg" class="gate-no hidden">У подростков и во время беременности пороги другие, а у беременных они ещё и разные по триместрам<sup><a href="#" onclick="return false">ВОЗ</a></sup>. Чтобы не ввести тебя в заблуждение, Ferrum не будет оценивать цифры. Покажи бланк врачу 💛
+        <button class="btn ghost small" style="margin-top:10px" onclick="gateYes(true)">Посмотреть пример всё равно</button></div>
+    </div>
+  </div>
+
+  <div class="foot">Данные хранятся только в твоём браузере</div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

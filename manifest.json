@@ -1,0 +1,17 @@
+{
+  "name": "Ferrum — понятные анализы на железо",
+  "short_name": "Ferrum",
+  "description": "Разбор анализов на железо, динамика и напоминания о приёме. Данные остаются только на твоём устройстве.",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF6F7",
+  "theme_color": "#8E1330",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
